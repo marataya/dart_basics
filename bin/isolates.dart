@@ -2,10 +2,12 @@ import 'dart:isolate';
 
 import 'package:compute/compute.dart';
 
-void playHideAndSeek(SendPort sendPort) {
+void playHideAndSeek(List<Object> args) {
+  final sendPort = args[0] as SendPort;
+  final countTo = args[1] as int;
   sendPort.send('Starting counting...');
   var counting = 0;
-  for (var i = 1; i < 1000000000; i++) {
+  for (var i = 1; i < countTo; i++) {
     counting = i;
   }
   sendPort.send('$counting, message from the Isolate');
@@ -27,7 +29,7 @@ int fibonacci(int n) {
 Future<void> main() async {
   final receivePort = ReceivePort();
 
-  final isolate = await Isolate.spawn(playHideAndSeek, receivePort.sendPort);
+  final isolate = await Isolate.spawn(playHideAndSeek, [receivePort.sendPort, 1000000000]);
 
   receivePort.listen((Object? message) {
     if(message is String) {
